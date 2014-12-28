@@ -1,1 +1,255 @@
-this is the xml file
+<?xml version="1.0" encoding="UTF-8"?>
+<xmodel version="2" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://flame.ac.uk/schema/xmml_v2.xsd">
+    <name></name>
+    <version>1</version>
+    <author></author>
+    <description>Decentralised Bitcoin transactions between traders/sellers : tested with xparser 0.15.11</description>
+    <environment>
+	<functionFiles>
+            <file>person_functions.c</file>
+	       <file>averager_functions.c</file>
+	     <file>generate_person_functions.c</file>
+	     <file>my_library_functions.c</file>	      
+	</functionFiles>
+	
+	<dataTypes>
+		<dataType>
+			<name>record</name>
+			<description></description>
+			<variables>
+				<variable><type>int</type><name>person_id</name><description></description></variable>
+				<variable><type>double</type><name>bitcoinno</name><description></description></variable>
+			</variables>
+		</dataType>
+	</dataTypes>
+    </environment>
+
+   <agents>
+	<xagent>
+	<name>Generator</name>
+	<memory>
+		<variable><type>int</type> <name>id</name><description></description> </variable>
+		<variable><type>int</type> <name>number_people_generated</name><description></description> </variable>
+		<variable><type>int</type> <name>x</name><description></description> </variable>
+		<variable><type>int</type> <name>y</name><description></description> </variable>
+	</memory>
+	<functions>
+	<function>
+                    <name>generate_people</name>
+                    <description></description>
+                    <currentState>g1</currentState>
+                    <nextState>g2</nextState>
+		<outputs>
+			<output>  <messageName>people_in_simulation</messageName>   </output>
+		</outputs>
+	</function>
+	</functions>
+	</xagent>
+    
+	<xagent>
+          <name>Person</name>
+          <description></description>
+          <memory>
+		<variable><type>int</type>  <name>id</name>  <description></description>         </variable>
+		<variable><type>int</type>  <name>x</name> <description></description>    </variable>
+		<variable> <type>int</type>  <name>y</name><description></description>      </variable>
+		<variable> <type>int</type>  <name>mychoice</name><description></description>      </variable>
+		<variable>    <type>int</type>     <name>buyingorselling</name>   <description></description>         </variable>
+		<variable>     <type>double</type> <name>totalbitcoins</name>    <description></description>    </variable>
+		<variable>       <type>int</type>    <name>timelocked</name>     <description></description>      </variable>
+		<variable>       <type>record_array</type>    <name>ledger</name>     <description></description>      </variable>
+		<variable>     <type>double</type> <name>price</name>    <description></description>    </variable>
+		<variable>       <type>int</type>    <name>im_locked</name>     <description></description>      </variable>
+		<variable>     <type>int</type> <name>my_counter</name>    <description></description>    </variable>
+		<variable>     <type>double</type> <name>locked_price</name>    <description></description>    </variable>
+		<variable>       <type>int</type>    <name>locked_buyer</name>     <description></description>      </variable>
+		<variable>     <type>int</type> <name>locked_seller</name>    <description></description>    </variable>
+		<variable>     <type>double</type> <name>locked_bits</name>    <description></description>    </variable>
+          </memory>
+          <functions>
+	    
+	<function>
+		<name>broadcast_my_bitcoin</name>
+		<description></description>
+		<currentState>start</currentState>
+                    <nextState>start1</nextState>
+                    <outputs>
+			<output>  <messageName>broadcast_ledger</messageName>   </output>
+                    </outputs>
+	</function>
+		
+	<function>
+		<name>update_my_ledger</name>
+                    <description></description>
+                    <currentState>start1</currentState>
+                    <nextState>start2</nextState>
+                    <inputs>
+			<input>  <messageName>broadcast_ledger</messageName>   </input>
+                    </inputs>
+	</function>
+		
+          <function>
+		<name>advert_selling_buying</name>
+                    <description></description>
+                    <currentState>start2</currentState>
+                    <nextState>s1</nextState>
+                    <outputs>
+			<output>  <messageName>msg_send_status</messageName>   </output>
+                    </outputs>
+	</function>
+          
+	<function>
+		<name>read_sellers</name>
+                    <description></description>
+                    <currentState>s1</currentState>
+                    <nextState>s2</nextState>
+		<inputs>
+			<input>  <messageName>msg_send_status</messageName>   </input>
+                    </inputs>
+		<outputs>
+			<output>  <messageName>msg_choose_seller</messageName>   </output>
+                    </outputs>
+	</function>
+          
+	<function>
+		<name>confirm_transaction</name>
+                    <description></description>
+                    <currentState>s2</currentState>
+                    <nextState>s31</nextState>
+		<inputs>
+			<input>  <messageName>msg_choose_seller</messageName>   </input>
+                    </inputs>
+                    <outputs>
+                        <output> <messageName>msg_confirm_transaction</messageName>  </output>
+                    </outputs>
+	</function>
+		
+	<function>
+		<name>get_sellers</name>
+                    <description></description>
+                    <currentState>s31</currentState>
+                    <nextState>s3</nextState>
+		<inputs>
+                        <input>   <messageName>msg_confirm_transaction</messageName>    </input>
+                    </inputs>
+	</function>
+               
+	 <function>
+		<name>locked</name>
+                    <description></description>
+                    <currentState>s3</currentState>
+                    <nextState>s4</nextState>
+	</function>
+		
+          <function>
+		<name>transfer_money</name>
+                    <description></description>
+                    <currentState>s4</currentState>
+                    <nextState>s4a</nextState>
+		<outputs>
+		<output>    <messageName>money_transfer</messageName>      </output>
+		</outputs>
+	</function>
+			  
+	<function>
+		<name>read_money</name>
+                    <description></description>
+                    <currentState>s4a</currentState>
+                    <nextState>s4b</nextState>
+		<inputs>
+                        <input>    <messageName>money_transfer</messageName>       </input>
+		 </inputs>
+	</function>
+			  
+          </functions>
+	</xagent>
+	
+	<xagent>
+	<name>Averager</name>
+	<memory>
+		<variable><type>int</type> <name>id</name><description></description> </variable>
+		<variable><type>int</type> <name>number_of_transactions</name><description></description> </variable>
+		<variable><type>double</type> <name>average_price</name><description></description> </variable>
+		<variable><type>double</type> <name>bitcoin_number_total</name><description></description> </variable>
+		<variable><type>double</type> <name>true_avg_price</name><description>volume weighted average price</description> </variable>
+		<variable><type>int</type> <name>numbers</name><description>volume weighted average price</description> </variable>
+	</memory>
+	
+	<functions>
+	<function>
+		<name>collect_data</name>
+                    <description></description>
+                    <currentState>g1</currentState>
+                    <nextState>g2</nextState>
+		<inputs>
+			<input>  <messageName>broadcast_ledger</messageName>   </input>
+			<input>  <messageName>money_transfer</messageName>   </input>
+			<input>  <messageName>people_in_simulation</messageName>   </input>
+                    </inputs>
+	</function>
+	</functions>
+	</xagent>
+    </agents>
+    
+<messages>
+     <message>
+            <name>broadcast_ledger</name>
+            <description></description>
+            <variables>
+                <variable> <type>int</type>  <name>id</name>  <description></description>    </variable>
+                <variable>   <type>double</type>   <name>bits</name>   <description></description>        </variable>
+            </variables>
+        </message>
+      <message>
+            <name>msg_send_status</name>
+            <description></description>
+            <variables>
+                <variable> <type>int</type>  <name>id</name>  <description></description>    </variable>
+                <variable>   <type>int</type>   <name>choice</name>   <description></description>        </variable>
+                <variable>   <type>double</type>    <name>price</name>  <description></description>          </variable>
+            </variables>
+        </message>
+	  <message>
+            <name>msg_choose_seller</name>
+            <description></description>
+            <variables>
+                <variable> <type>int</type>  <name>buy_id</name>  <description></description>    </variable>
+                <variable>   <type>int</type>   <name>sell_id</name>   <description></description>        </variable>
+                <variable>   <type>double</type>    <name>bits</name>  <description></description>          </variable>
+	    <variable>   <type>double</type>    <name>price</name>  <description></description>          </variable>
+            </variables>
+        </message>
+        <message>
+            <name>msg_confirm_transaction</name>
+            <description></description>
+            <variables>
+                <variable> <type>int</type>  <name>buy_id</name>  <description></description>    </variable>
+                <variable>   <type>int</type>   <name>sell_id</name>   <description></description>        </variable>
+                <variable>   <type>double</type>    <name>bits</name>  <description></description>          </variable>
+		   <variable>   <type>double</type>    <name>price</name>  <description></description>          </variable>
+            </variables>
+        </message>
+      
+	
+	  <message>
+            <name>money_transfer</name>
+            <description></description>
+            <variables>
+                      <variable> <type>int</type>  <name>buy_id</name>  <description></description>    </variable>
+                <variable>   <type>int</type>   <name>sell_id</name>   <description></description>        </variable>
+                <variable>   <type>double</type>    <name>bits</name>  <description></description>          </variable>
+		   <variable>   <type>double</type>    <name>price</name>  <description></description>          </variable>
+            </variables>
+        </message>
+	
+	 <message>
+            <name>people_in_simulation</name>
+            <description></description>
+            <variables>
+                      <variable> <type>int</type>  <name>id</name>  <description></description>    </variable>
+                <variable>   <type>int</type>   <name>people</name>   <description></description>        </variable>
+                </variables>
+        </message>
+	
+    </messages>
+</xmodel>
