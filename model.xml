@@ -11,7 +11,7 @@
 	     <file>generate_person_functions.c</file>
 	     <file>my_library_functions.c</file>	      
 	</functionFiles>
-	
+	<!-- added comment-->
 	<dataTypes>
 		<dataType>
 			<name>record</name>
